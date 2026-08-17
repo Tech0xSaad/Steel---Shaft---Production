@@ -1,0 +1,12 @@
+{
+  "name": "steel-shaft-erp",
+  "version": "0.1.0",
+  "description": "Steel Shaft Manufacturing ERP — Monorepo Root",
+  "private": true,
+  "scripts": {
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build:client": "cd client && npm run build"
+  }
+}
