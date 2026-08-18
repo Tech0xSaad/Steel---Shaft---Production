@@ -8,7 +8,7 @@ import { Spinner } from '@/components/ui/Spinner'
  * so they never see the login page while logged in.
  */
 export function PublicRoute() {
-  const { isAuthenticated, loading } = useAuth()
+  const { isAuthenticated, loading, isVerified } = useAuth()
 
   if (loading) {
     return (
@@ -18,5 +18,9 @@ export function PublicRoute() {
     )
   }
 
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Outlet />
+  if (isAuthenticated) {
+    return isVerified ? <Navigate to="/dashboard" replace /> : <Navigate to="/not-verified" replace />
+  }
+
+  return <Outlet />
 }

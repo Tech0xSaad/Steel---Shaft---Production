@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/api/supabaseClient'
-import { signIn, signOut, getSession } from '@/services/authService'
+import { signIn, signOut, getSession, signUp } from '@/services/authService'
 
 const AuthContext = createContext(null)
 
@@ -10,12 +10,13 @@ const AuthContext = createContext(null)
  * login / logout events without prop drilling.
  */
 export function AuthProvider({ children }) {
-  const [user, setUser]       = useState(null)
+  const [user, setUser] = useState(null)
   const [session, setSession] = useState(null)
-  const [loading, setLoading] = useState(true)  // true until initial session check completes
-  const [error, setError]     = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  // ── Bootstrap: load existing session on mount ─────────────────────────────
+  const isVerified = Boolean(user?.user_metadata?.is_verified)
+
   useEffect(() => {
     let mounted = true
 
@@ -30,7 +31,6 @@ export function AuthProvider({ children }) {
       setLoading(false)
     })
 
-    // Listen to all future auth state changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, newSession) => {
         if (!mounted) return
@@ -47,7 +47,6 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  // ── Actions ───────────────────────────────────────────────────────────────
   const login = useCallback(async (email, password) => {
     setError(null)
     const { data, error: err } = await signIn(email, password)
@@ -55,6 +54,29 @@ export function AuthProvider({ children }) {
       setError(err.message)
       return { success: false, error: err.message }
     }
+
+    const authUser = data?.user ?? null
+    const isUserVerified = Boolean(authUser?.user_metadata?.is_verified)
+
+    if (!isUserVerified) {
+      setSession(data.session)
+      setUser(authUser)
+      return { success: true, verified: false }
+    }
+
+    setSession(data.session)
+    setUser(authUser)
+    return { success: true, verified: true }
+  }, [])
+
+  const signup = useCallback(async (email, password, fullName) => {
+    setError(null)
+    const { data, error: err } = await signUp(email, password, fullName)
+    if (err) {
+      setError(err.message)
+      return { success: false, error: err.message }
+    }
+
     setSession(data.session)
     setUser(data.user)
     return { success: true }
@@ -79,7 +101,9 @@ export function AuthProvider({ children }) {
     loading,
     error,
     isAuthenticated: !!session && !!user,
+    isVerified,
     login,
+    signup,
     logout,
     clearError,
   }
@@ -87,9 +111,6 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
-/**
- * Hook to consume auth context. Must be used inside <AuthProvider>.
- */
 export function useAuth() {
   const ctx = useContext(AuthContext)
   if (!ctx) {

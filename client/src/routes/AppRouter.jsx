@@ -7,6 +7,8 @@ import { DashboardLayout }  from '@/components/layout/DashboardLayout'
 
 // Public
 import { LoginPage }        from '@/pages/auth/LoginPage'
+import { SignupPage }       from '@/pages/auth/SignupPage'
+import { NotVerifiedPage }  from '@/pages/auth/NotVerifiedPage'
 
 // Dashboard
 import { DashboardHome }    from '@/pages/dashboard/DashboardHome'
@@ -72,7 +74,10 @@ export function AppRouter() {
       {/* Public */}
       <Route element={<PublicRoute />}>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
       </Route>
+
+      <Route path="/not-verified" element={<NotVerifiedPage />} />
 
       {/* Protected — all inside DashboardLayout */}
       <Route element={<ProtectedRoute />}>

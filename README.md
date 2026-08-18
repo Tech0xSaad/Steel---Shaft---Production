@@ -86,8 +86,35 @@ Open **Supabase Dashboard → SQL Editor** and run the migration files **in orde
 
 1. `supabase/migrations/001_master_data.sql`
 2. `supabase/migrations/002_production_batches.sql`
+3. `supabase/migrations/003_inventory_management.sql`
+4. `supabase/migrations/004_manufacturing_execution.sql`
+5. `supabase/migrations/005_quality_scrap_finished_goods.sql`
 
-### 2. Configure environment variables
+If you want the full consolidated schema, you can also run the single script:
+`supabase/migrations/000_complete_schema.sql`
+
+### 2. Create the initial admin user
+
+Do not try to call `auth.admin.create_user` directly from the SQL editor. In Supabase, that function is not available from the main database context and raises the cross-database error you saw.
+
+Use the project helper instead:
+
+```bash
+cd server
+npm install
+SUPABASE_URL="https://your-project.supabase.co" \
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key" \
+node scripts/create-admin.js
+```
+
+This creates the default admin user with:
+
+- Email: `admin@steelshaft.local`
+- Password: `Admin@123`
+- Role: `admin`
+- Full name: `System Administrator`
+
+### 3. Configure environment variables
 
 ```bash
 # Client

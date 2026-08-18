@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { Eye, EyeOff, Cog, Mail, Lock } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/Button'
-import { Input  } from '@/components/ui/Input'
-import { Alert  } from '@/components/ui/Alert'
+import { Input } from '@/components/ui/Input'
+import { Alert } from '@/components/ui/Alert'
 import { APP_NAME } from '@/constants/app'
 
 /**
@@ -49,11 +49,16 @@ export function LoginPage() {
     }
 
     setLoading(true)
-    const { success, error } = await login(form.email, form.password)
+    const result = await login(form.email, form.password)
     setLoading(false)
 
-    if (!success) {
-      setServerError(error ?? 'Invalid credentials. Please try again.')
+    if (!result.success) {
+      setServerError(result.error ?? 'Invalid credentials. Please try again.')
+      return
+    }
+
+    if (result.verified === false) {
+      navigate('/not-verified', { replace: true })
       return
     }
 
@@ -132,6 +137,13 @@ export function LoginPage() {
               Sign in
             </Button>
           </form>
+
+          <p className="mt-6 text-center text-sm text-surface-600">
+            Need access?{' '}
+            <Link to="/signup" className="font-semibold text-primary-600 hover:text-primary-700">
+              Create account
+            </Link>
+          </p>
         </div>
 
         <p className="mt-6 text-center text-xs text-surface-400">

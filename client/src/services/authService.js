@@ -1,6 +1,25 @@
 import { supabase } from '@/api/supabaseClient'
 
 /**
+ * Sign up a new user and default them to unverified.
+ * The app blocks access until an admin sets is_verified = true.
+ */
+export async function signUp(email, password, fullName) {
+  const { data, error } = await supabase.auth.signUp({
+    email: email.trim().toLowerCase(),
+    password,
+    options: {
+      data: {
+        full_name: fullName.trim(),
+        role: 'user',
+        is_verified: false,
+      },
+    },
+  })
+  return { data, error }
+}
+
+/**
  * Sign in with email + password via Supabase Auth.
  * Returns { data: { session, user }, error }
  */

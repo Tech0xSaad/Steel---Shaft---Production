@@ -10,7 +10,7 @@ import { Spinner } from '@/components/ui/Spinner'
  * - If authenticated: renders child routes via <Outlet />.
  */
 export function ProtectedRoute() {
-  const { isAuthenticated, loading } = useAuth()
+  const { isAuthenticated, loading, isVerified } = useAuth()
   const location = useLocation()
 
   if (loading) {
@@ -23,6 +23,10 @@ export function ProtectedRoute() {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />
+  }
+
+  if (!isVerified && location.pathname !== '/not-verified') {
+    return <Navigate to="/not-verified" replace />
   }
 
   return <Outlet />
