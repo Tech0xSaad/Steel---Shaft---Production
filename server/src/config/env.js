@@ -23,9 +23,10 @@ export const env = {
   SUPABASE_ANON_KEY:         requireEnv('SUPABASE_ANON_KEY'),
 
   // CORS
-  ALLOWED_ORIGINS: (process.env.ALLOWED_ORIGINS ?? 'http://localhost:5173')
+  ALLOWED_ORIGINS: (process.env.ALLOWED_ORIGINS ?? 'http://localhost:5173,https://steel-shaft-production.vercel.app')
     .split(',')
-    .map((o) => o.trim()),
+    .map((o) => o.trim())
+    .filter(Boolean),
 
   // Rate limiting
   RATE_LIMIT_WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS ?? '900000', 10),

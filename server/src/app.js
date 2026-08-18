@@ -21,10 +21,16 @@ app.use(helmet({
 // ── CORS ──────────────────────────────────────────────────────────────────
 app.use(cors({
   origin: (origin, callback) => {
+    const allowedOrigins = env.ALLOWED_ORIGINS
+    const isAllowedOrigin = origin && (
+      allowedOrigins.includes(origin) || /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(origin)
+    )
+
     // Allow requests with no origin (mobile apps, curl, server-to-server)
-    if (!origin || env.ALLOWED_ORIGINS.includes(origin)) {
+    if (!origin || isAllowedOrigin) {
       return callback(null, true)
     }
+
     logger.warn(`CORS blocked origin: ${origin}`)
     callback(new Error(`Origin ${origin} not allowed by CORS`))
   },
